@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
 
-<AnchorPane id="AnchorPane" prefHeight="500" prefWidth="715.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chenum.controller.BasicFXMLController">
+<AnchorPane id="AnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chenum.controller.BasicFXMLController">
    <children>
-      <HBox prefHeight="266.0" prefWidth="715.0" />
+      <ToolBar minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="700.0">
+        <items>
+          <Button mnemonicParsing="false" onAction="#enterBlogManager" text="博客"/>
+            <Button mnemonicParsing="false" text="工具" />
+        </items>
+      </ToolBar>
    </children>
+
 </AnchorPane>
