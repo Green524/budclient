@@ -7,28 +7,41 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 
 public class BasicFXMLController {
 
+
+
+
     private static Parent blogManager;
+    private static Scene blogScene;
+    private static Stage stage;
 
     public void initialize() throws IOException {
-        blogManager = FXMLLoader.load(getClass().getResource("/BlogManagerFXML.fxml"));
+        blogManagerInitialize();
+    }
+
+    private void blogManagerInitialize() throws IOException {
+        if (Objects.isNull(blogManager)){
+            blogManager = FXMLLoader.load(getClass().getResource("/BlogManagerFXML.fxml"));
+        }
+        if (Objects.isNull(stage)){
+            stage = new Stage();
+            stage.setTitle("博客管理");
+        }
+        if (Objects.isNull(blogScene)){
+            blogScene = new Scene(blogManager);
+            stage.setScene(blogScene);
+        }
     }
 
     @FXML
-    private void enterBlogManager(ActionEvent event) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-        Stage stage = new Stage();
-        stage.setTitle("博客管理");
+    private void enterBlogManager(ActionEvent event){
         App.main().hide();
-        Scene scene = new Scene(blogManager);
-        stage.setScene(scene);
         stage.show();
     }
 }
