@@ -8,7 +8,7 @@
    <children>
       <ToolBar minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="700.0">
         <items>
-          <Button mnemonicParsing="false" onAction="#enterBlogManager" text="博客"/>
+          <Button mnemonicParsing="false" onAction="#enterBlogManager" text="博客" />
             <Button mnemonicParsing="false" text="工具" />
         </items>
       </ToolBar>

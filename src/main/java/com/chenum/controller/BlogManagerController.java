@@ -1,19 +1,31 @@
 package com.chenum.controller;
 
 import com.chenum.App;
-import com.chenum.model.Item;
+import com.chenum.cache.Cache;
+import com.chenum.config.Config;
+import com.chenum.hanlder.IDCell;
+import com.chenum.model.PageData;
+import com.chenum.model.ResultWrap;
+import com.chenum.po.Article;
+import com.chenum.util.HttpUtil;
+import com.chenum.util.JsonUtil;
+import com.chenum.util.SerializationUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.GridPane;
+import javafx.util.Callback;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 
 import java.io.IOException;
-import java.util.function.Consumer;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class BlogManagerController {
 
@@ -22,10 +34,11 @@ public class BlogManagerController {
     @FXML
     private AnchorPane anchorPane;
     @FXML
-    private TableView<Item> tableView;
+    private TableView<Article> tableView;
 
 
-    private static String[] itemKey = {"sku","descr","price","taxable"};
+    private SerializationUtil serializationUtil = new SerializationUtil();
+    private static String[] itemKey = {"","id","title","markdown","author","contentTag","wordCount","readTime","contribution","isLike","isComment","isAdmiration","status","publishTime","creator","createTime","updateTime","lastReviewer"};
     private static int keyIndex = 0;
 
     public void initialize() throws IOException {
@@ -33,15 +46,23 @@ public class BlogManagerController {
         tableInitialize();
     }
 
-    private void tableInitialize(){
+    private void tableInitialize() throws IOException {
         tableView.prefWidthProperty().bind(anchorPane.widthProperty());
-//        tableView.getItems().addAll(
-//                new Item("KBD-0455892", "Mechanical Keyboard", 100.0f, true),
-//                new Item( "145256", "Product Docs", 0.0f, false ),
-//                new Item( "OR-198975", "O-Ring (100)", 10.0f, true)
-//        );
-
-//        tableView.getColumns().forEach(itemTableColumn -> itemTableColumn.setCellValueFactory(new PropertyValueFactory<>(itemKey[keyIndex++])));
+        List<Article> list = queryItems();
+        tableView.getItems().addAll(list);
+        tableView.getColumns().forEach(itemTableColumn -> {
+            itemTableColumn.setCellValueFactory(new PropertyValueFactory<>(itemKey[keyIndex++]));
+        });
+        tableView.getVisibleLeafColumn(0).setCellFactory(new IDCell<>());
+    }
+    private List<Article> queryItems() throws IOException {
+        Header header = new BasicHeader("ch_access_token", (String) Cache.get("access_token"));
+        Map<String,Object> params1 = new HashMap<>(2);
+        params1.put("pageNum",1);
+        params1.put("pageSize",20);
+        String result = HttpUtil.get(Config.get("api.request.article.admin-query"),params1,new Header[]{header});
+        ResultWrap<PageData<Article>> wrapper = JsonUtil.jsonToObject(result, new TypeReference<>() {});
+        return wrapper.getData().getList();
     }
 
 

@@ -20,7 +20,7 @@ public class App extends Application {
     public void start(Stage primaryStage) throws IOException {
         primaryStage.setTitle("BudClient Dev");
         main = primaryStage;
-        Parent root = FXMLLoader.load(getClass().getResource("/BasicFXML.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/BasicFXML.fxml"));
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -29,5 +29,4 @@ public class App extends Application {
     public static Stage main(){
         return main;
     }
-
 }
