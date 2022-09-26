@@ -11,6 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.util.Strings;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -47,6 +48,9 @@ public class BasicFXMLController {
         params.put("username","chenum");
         params.put("password","www.chenum.com");
         String token = HttpUtil.post(Config.get("api.request.user.admin-login"),params);
+        if (Strings.isEmpty(token)){
+            return;
+        }
         Map<String,Object> map = JsonUtil.jsonToObject(token, Map.class);
         Map<String,Object> data = (Map<String, Object>) map.get("data");
         String chAccessToken = (String) data.get("access_token");

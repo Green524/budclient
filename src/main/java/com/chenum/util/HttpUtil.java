@@ -1,22 +1,29 @@
 package com.chenum.util;
 
 import com.chenum.config.Config;
+import com.chenum.config.CustomHttpRequestRetryHandler;
+import com.chenum.config.CustomServiceUnavailableRetryStrategy;
 import com.chenum.constant.Symbol;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.config.ConnectionConfig;
+import org.apache.http.config.SocketConfig;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,16 +34,32 @@ import java.util.function.Function;
 
 public class HttpUtil {
 
-    private static CloseableHttpClient client = HttpClientBuilder.create().setMaxConnTotal(20).build();
+    private static RequestConfig requestConfig = RequestConfig.custom()
+            .setConnectTimeout(50000)
+            .setConnectionRequestTimeout(10000)
+            .setSocketTimeout(50000)
+            .build();
+    private static CloseableHttpClient client = HttpClients.custom()
+            .setMaxConnTotal(20)
+            .setDefaultRequestConfig(requestConfig)
+            .setRetryHandler(new CustomHttpRequestRetryHandler())
+            .setServiceUnavailableRetryStrategy(new CustomServiceUnavailableRetryStrategy())
+            .build();
 
 
     public static String get(String url, Map<String,Object> params,Header[] headers) throws IOException {
-        HttpGet get = new HttpGet(url + getURlParameter(params));
-        get.setHeaders(headers);
-        get.setHeader("Content-Type","form-data");
-        CloseableHttpResponse response = client.execute(get);
-        HttpEntity respEntity = response.getEntity();
-        return EntityUtils.toString(respEntity, StandardCharsets.UTF_8);
+//        try {
+            HttpGet get = new HttpGet(url + getURlParameter(params));
+            get.setHeaders(headers);
+            get.setHeader("Content-Type","form-data");
+            CloseableHttpResponse response = client.execute(get);
+            HttpEntity respEntity = response.getEntity();
+            return EntityUtils.toString(respEntity, StandardCharsets.UTF_8);
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            System.out.println("连接失败:" + e.getMessage());
+//            throw new RuntimeException("连接失败");
+//        }
     }
 
     public static String post(String url, Map<String,Object> params) throws IOException {
@@ -44,13 +67,20 @@ public class HttpUtil {
     }
 
     public static String post(String url, Map<String,Object> params, Header[] headers) throws IOException {
-        HttpPost post = new HttpPost(url);
-        StringEntity entity = new StringEntity(JsonUtil.toJsonString(params), ContentType.APPLICATION_JSON);
-        post.setEntity(entity);
-        post.setHeaders(headers);
-        CloseableHttpResponse response = client.execute(post);
-        HttpEntity respEntity = response.getEntity();
-        return EntityUtils.toString(respEntity, StandardCharsets.UTF_8);
+//        try {
+            HttpPost post = new HttpPost(url);
+            StringEntity entity = new StringEntity(JsonUtil.toJsonString(params), ContentType.APPLICATION_JSON);
+            post.setEntity(entity);
+            post.setHeaders(headers);
+            CloseableHttpResponse response = client.execute(post);
+            HttpEntity respEntity = response.getEntity();
+            return EntityUtils.toString(respEntity, StandardCharsets.UTF_8);
+//        }catch (IOException e){
+//            e.printStackTrace();
+//            System.out.println("连接失败:" + e.getMessage());
+//            throw new RuntimeException("连接失败");
+//        }
+
     }
 
     private static String getURlParameter(Map<String,Object> paramsMap){
