@@ -4,7 +4,8 @@ import com.chenum.App;
 import com.chenum.cache.Cache;
 import com.chenum.config.Config;
 import com.chenum.config.ExecutorThreadPool;
-import com.chenum.hanlder.IDCell;
+import com.chenum.hanlder.DateValueFactory;
+import com.chenum.hanlder.IDValueFactory;
 import com.chenum.model.PageData;
 import com.chenum.model.ResultWrap;
 import com.chenum.po.Article;
@@ -12,12 +13,13 @@ import com.chenum.util.HttpUtil;
 import com.chenum.util.JsonUtil;
 import com.chenum.util.SerializationUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.control.*;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Callback;
 import org.apache.http.Header;
@@ -43,12 +45,15 @@ public class BlogManagerController {
     private static int keyIndex = 0;
 
     public void initialize() throws IOException {
-        menuBar.prefWidthProperty().bind(anchorPane.widthProperty());
-        tableInitialize();
+        this.setTableStyle();
+        this.tableInitialize();
     }
 
+    private void setTableStyle(){
+        menuBar.prefWidthProperty().bind(anchorPane.widthProperty());
+    }
     private void tableInitialize(){
-        tableView.prefWidthProperty().bind(anchorPane.widthProperty());
+        this.tableView.prefWidthProperty().bind(anchorPane.widthProperty());
         ExecutorThreadPool.service().execute(() -> {
             try {
                 setItems();
@@ -58,12 +63,41 @@ public class BlogManagerController {
         });
     }
     private void setItems() throws IOException {
-        List<Article> list = queryItems();
-        tableView.getItems().addAll(list);
-        tableView.getColumns().forEach(itemTableColumn -> {
-            itemTableColumn.setCellValueFactory(new PropertyValueFactory<>(itemKey[keyIndex++]));
+        this.tableView.getItems().addAll(queryItems());
+        this.setCellFormat();
+        this.setRowFactory();
+    }
+
+    /**
+     * 设置行处理
+     */
+    private void setRowFactory(){
+        this.tableView.setRowFactory(param -> {
+            final TableRow<Article> tableRow = new TableRow<>();
+            tableRow.setOnMouseClicked(event -> {
+                int secondary = event.getButton().compareTo(MouseButton.SECONDARY);
+                if (secondary == 0){
+                    final ContextMenu contextMenu = new ContextMenu();
+                    MenuItem menuItem = new MenuItem("查看");
+                    MenuItem editItem = new MenuItem("编辑");
+                    MenuItem delItem = new MenuItem("删除");
+                    MenuItem recallItem = new MenuItem("撤回");
+                    contextMenu.getItems().addAll(menuItem,editItem,delItem,recallItem);
+                    tableRow.setContextMenu(contextMenu);
+                }
+            });
+            return tableRow;
         });
-        tableView.getVisibleLeafColumn(0).setCellFactory(new IDCell<>());
+    }
+
+    @SuppressWarnings({"unchecked","rawtypes"})
+    private void setCellFormat(){
+        this.tableView.getColumns().forEach(itemTableColumn -> itemTableColumn.setCellValueFactory(new PropertyValueFactory<>(itemKey[keyIndex++])));
+        this.tableView.getVisibleLeafColumn(0).setCellFactory(new IDValueFactory<>());
+        DateValueFactory dateValueFactory = new DateValueFactory<>();
+        this.tableView.getVisibleLeafColumn(13).setCellFactory(dateValueFactory);
+        this.tableView.getVisibleLeafColumn(15).setCellFactory(dateValueFactory);
+        this.tableView.getVisibleLeafColumn(16).setCellFactory(dateValueFactory);
     }
     private List<Article> queryItems() throws IOException {
         Header header = new BasicHeader("ch_access_token", (String) Cache.get("access_token"));
