@@ -42,8 +42,8 @@ public class HttpUtil {
     private static CloseableHttpClient client = HttpClients.custom()
             .setMaxConnTotal(20)
             .setDefaultRequestConfig(requestConfig)
-            .setRetryHandler(new CustomHttpRequestRetryHandler())
-            .setServiceUnavailableRetryStrategy(new CustomServiceUnavailableRetryStrategy())
+//            .setRetryHandler(new CustomHttpRequestRetryHandler())
+//            .setServiceUnavailableRetryStrategy(new CustomServiceUnavailableRetryStrategy())
             .build();
 
 

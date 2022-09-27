@@ -26,7 +26,6 @@ public class BasicFXMLController {
 
     public void initialize() throws IOException {
         login();
-        blogManagerInitialize();
     }
 
     private void blogManagerInitialize() throws IOException {
@@ -59,8 +58,9 @@ public class BasicFXMLController {
     }
 
     @FXML
-    private void enterBlogManager(ActionEvent event){
+    private void enterBlogManager(ActionEvent event) throws IOException {
         App.main().hide();
+        blogManagerInitialize();
         stage.show();
     }
 }

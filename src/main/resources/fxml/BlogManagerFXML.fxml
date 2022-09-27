@@ -31,7 +31,7 @@
         </MenuBar>
         <TableView fx:id="tableView" layoutY="26.0" prefHeight="512.0" prefWidth="822.0" tableMenuButtonVisible="true">
             <columns>
-                <TableColumn prefWidth="75.0" text="序号" fx:id="index"/>
+                <TableColumn prefWidth="75.0" text="序号"/>
                 <TableColumn prefWidth="75.0" text="ID"/>
                 <TableColumn prefWidth="75.0" text="标题" />
                 <TableColumn prefWidth="75.0" text="markdown" />
@@ -44,7 +44,7 @@
                 <TableColumn prefWidth="75.0" text="评论" />
                 <TableColumn prefWidth="75.0" text="赞赏" />
                 <TableColumn prefWidth="75.0" text="状态" />
-                <TableColumn prefWidth="75.0" text="发布时间" />
+                <TableColumn prefWidth="75.0" text="发布时间" cellValueFactory="com.chenum.config.DateCellPropertyValueFactory"/>
                 <TableColumn prefWidth="75.0" text="创建者" />
                 <TableColumn prefWidth="75.0" text="创建时间" />
                 <TableColumn prefWidth="75.0" text="更新时间" />

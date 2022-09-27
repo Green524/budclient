@@ -3,6 +3,7 @@ package com.chenum.controller;
 import com.chenum.App;
 import com.chenum.cache.Cache;
 import com.chenum.config.Config;
+import com.chenum.config.ExecutorThreadPool;
 import com.chenum.hanlder.IDCell;
 import com.chenum.model.PageData;
 import com.chenum.model.ResultWrap;
@@ -46,8 +47,17 @@ public class BlogManagerController {
         tableInitialize();
     }
 
-    private void tableInitialize() throws IOException {
+    private void tableInitialize(){
         tableView.prefWidthProperty().bind(anchorPane.widthProperty());
+        ExecutorThreadPool.service().execute(() -> {
+            try {
+                setItems();
+            } catch (IOException e) {
+                throw new RuntimeException("设置列表信息失败");
+            }
+        });
+    }
+    private void setItems() throws IOException {
         List<Article> list = queryItems();
         tableView.getItems().addAll(list);
         tableView.getColumns().forEach(itemTableColumn -> {
