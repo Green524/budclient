@@ -1,6 +1,5 @@
 package com.chenum.hanlder;
 
-import com.chenum.po.Article;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.util.Callback;

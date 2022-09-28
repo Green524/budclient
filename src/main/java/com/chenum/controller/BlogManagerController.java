@@ -4,6 +4,7 @@ import com.chenum.App;
 import com.chenum.cache.Cache;
 import com.chenum.config.Config;
 import com.chenum.config.ExecutorThreadPool;
+import com.chenum.hanlder.CellEditEventHandler;
 import com.chenum.hanlder.DateValueFactory;
 import com.chenum.hanlder.IDValueFactory;
 import com.chenum.model.PageData;
@@ -18,10 +19,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 
@@ -39,6 +42,9 @@ public class BlogManagerController {
     @FXML
     private TableView<Article> tableView;
 
+    @FXML
+    private TableColumn<Article,String> title;
+
 
     private SerializationUtil serializationUtil = new SerializationUtil();
     private static String[] itemKey = {"","id","title","markdown","author","contentTag","wordCount","readTime","contribution","isLike","isComment","isAdmiration","status","publishTime","creator","createTime","updateTime","lastReviewer"};
@@ -51,6 +57,14 @@ public class BlogManagerController {
 
     private void setTableStyle(){
         menuBar.prefWidthProperty().bind(anchorPane.widthProperty());
+
+        title.setCellFactory(TextFieldTableCell.forTableColumn());
+        title.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Article, String>>() {
+            @Override
+            public void handle(TableColumn.CellEditEvent<Article, String> stringStringCellEditEvent) {
+                ((stringStringCellEditEvent.getTableView().getItems().get(stringStringCellEditEvent.getTablePosition().getRow()))).setTitle(stringStringCellEditEvent.getNewValue());
+            }
+        });
     }
     private void tableInitialize(){
         this.tableView.prefWidthProperty().bind(anchorPane.widthProperty());
@@ -74,6 +88,7 @@ public class BlogManagerController {
     private void setRowFactory(){
         this.tableView.setRowFactory(param -> {
             final TableRow<Article> tableRow = new TableRow<>();
+            tableRow.setEditable(true);
             tableRow.setOnMouseClicked(event -> {
                 int secondary = event.getButton().compareTo(MouseButton.SECONDARY);
                 if (secondary == 0){
@@ -92,12 +107,15 @@ public class BlogManagerController {
 
     @SuppressWarnings({"unchecked","rawtypes"})
     private void setCellFormat(){
-        this.tableView.getColumns().forEach(itemTableColumn -> itemTableColumn.setCellValueFactory(new PropertyValueFactory<>(itemKey[keyIndex++])));
+        this.tableView.getColumns().forEach(itemTableColumn -> {
+            itemTableColumn.setCellValueFactory(new PropertyValueFactory<>(itemKey[keyIndex++]));
+        });
         this.tableView.getVisibleLeafColumn(0).setCellFactory(new IDValueFactory<>());
         DateValueFactory dateValueFactory = new DateValueFactory<>();
         this.tableView.getVisibleLeafColumn(13).setCellFactory(dateValueFactory);
         this.tableView.getVisibleLeafColumn(15).setCellFactory(dateValueFactory);
         this.tableView.getVisibleLeafColumn(16).setCellFactory(dateValueFactory);
+        this.tableView.setEditable(true);
     }
     private List<Article> queryItems() throws IOException {
         Header header = new BasicHeader("ch_access_token", (String) Cache.get("access_token"));

@@ -32,7 +32,7 @@
             <columns>
                 <TableColumn prefWidth="75.0" text="序号"/>
                 <TableColumn prefWidth="75.0" text="ID"/>
-                <TableColumn prefWidth="75.0" text="标题" />
+                <TableColumn prefWidth="75.0" text="标题" fx:id="title"/>
                 <TableColumn prefWidth="75.0" text="markdown" />
                 <TableColumn prefWidth="75.0" text="作者" />
                 <TableColumn prefWidth="75.0" text="标签" />
