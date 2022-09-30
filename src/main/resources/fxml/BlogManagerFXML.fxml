@@ -7,7 +7,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane fx:id="anchorPane" prefHeight="512.0" prefWidth="822.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chenum.controller.BlogManagerController">
+<AnchorPane fx:id="anchorPane" prefHeight="512.0" prefWidth="822.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chenum.controller.BlogManagerFXMLController">
     <children>
         <MenuBar fx:id="menuBar">
             <menus>

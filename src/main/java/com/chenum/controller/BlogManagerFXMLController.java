@@ -21,19 +21,20 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.util.Callback;
-import javafx.util.StringConverter;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BlogManagerController {
+public class BlogManagerFXMLController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlogManagerFXMLController.class);
 
     @FXML
     private MenuBar menuBar;
@@ -50,7 +51,7 @@ public class BlogManagerController {
     private static String[] itemKey = {"","id","title","markdown","author","contentTag","wordCount","readTime","contribution","isLike","isComment","isAdmiration","status","publishTime","creator","createTime","updateTime","lastReviewer"};
     private static int keyIndex = 0;
 
-    public void initialize() throws IOException {
+    public void initialize(){
         this.setTableStyle();
         this.tableInitialize();
     }
@@ -72,7 +73,7 @@ public class BlogManagerController {
             try {
                 setItems();
             } catch (IOException e) {
-                throw new RuntimeException("设置列表信息失败");
+                LOGGER.error("获取失败,{}",e.getMessage());
             }
         });
     }
