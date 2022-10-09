@@ -7,11 +7,13 @@ import com.chenum.config.ExecutorThreadPool;
 import com.chenum.util.HttpUtil;
 import com.chenum.util.JsonUtil;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +35,7 @@ public class BasicFXMLController {
     private static Scene logScene;
     private static Stage logStage;
 
-    public void initialize(){
+    public void initialize() {
         login();
     }
 
@@ -42,26 +44,27 @@ public class BasicFXMLController {
         ExecutorThreadPool.service().execute(new Runnable() {
             @Override
             public void run() {
-                Map<String,Object> params = new HashMap<>(2);
-                params.put("username","chenum");
-                params.put("password","www.chenum.com");
+                Map<String, Object> params = new HashMap<>(2);
+                params.put("username", "chenum");
+                params.put("password", "www.chenum.com");
                 String token = null;
                 try {
-                    token = HttpUtil.post(Config.get("api.request.user.admin-login"),params);
+                    token = HttpUtil.post(Config.get("api.request.user.admin-login"), params);
                 } catch (IOException e) {
                     throw new RuntimeException("登录失败");
                 }
-                if (Strings.isEmpty(token)){
+                if (Strings.isEmpty(token)) {
                     return;
                 }
-                Map<String,Object> map = JsonUtil.jsonToObject(token, Map.class);
-                Map<String,Object> data = (Map<String, Object>) map.get("data");
+                Map<String, Object> map = JsonUtil.jsonToObject(token, Map.class);
+                Map<String, Object> data = (Map<String, Object>) map.get("data");
                 String chAccessToken = (String) data.get("access_token");
-                Cache.put("access_token",chAccessToken);
+                Cache.put("access_token", chAccessToken);
                 LOGGER.info("登录成功!");
             }
         });
     }
+
     @FXML
     private void enterBlogManager(ActionEvent event) throws IOException {
         App.main().hide();
@@ -70,36 +73,33 @@ public class BasicFXMLController {
     }
 
     @FXML
-    private void enterBlogView(ActionEvent event) throws IOException {
-        blogViewInitialize();
+    private void enterLogView(ActionEvent event) throws IOException {
+        logViewInitialize();
         logStage.show();
     }
 
     private void blogManagerInitialize() throws IOException {
-        if (Objects.isNull(blogManager)){
+        if (Objects.isNull(blogManager)) {
             blogManager = FXMLLoader.load(getClass().getResource("/fxml/BlogManagerFXML.fxml"));
         }
-        if (Objects.isNull(stage)){
+        if (Objects.isNull(stage)) {
             stage = new Stage();
             stage.setTitle("博客管理");
         }
-        if (Objects.isNull(blogScene)){
+        if (Objects.isNull(blogScene)) {
             blogScene = new Scene(blogManager);
             stage.setScene(blogScene);
         }
     }
 
-    private void blogViewInitialize() throws IOException {
-        if (Objects.isNull(logView)){
-            logView = FXMLLoader.load(getClass().getResource("/fxml/LogFXML.fxml"));
-        }
-        if (Objects.isNull(logStage)){
-            logStage = new Stage();
-            logStage.setTitle("日志");
-        }
-        if (Objects.isNull(logScene)){
-            logScene = new Scene(logView);
-            logStage.setScene(logScene);
-        }
+    private void logViewInitialize() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LogFXML.fxml"));
+        logView = loader.load();
+        logStage = new Stage();
+        logStage.setTitle("日志");
+        LogFXMLController controller = loader.getController();
+        controller.setCloseEvent(logStage);
+        logScene = new Scene(logView);
+        logStage.setScene(logScene);
     }
 }

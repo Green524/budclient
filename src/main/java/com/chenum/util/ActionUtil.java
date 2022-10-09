@@ -15,7 +15,6 @@ public class ActionUtil {
         Object node = sourceMethod.invoke(event);
         Method sceneMethod = node.getClass().getMethod("getScene");
         Scene scene = (Scene) sceneMethod.invoke(node);
-
         ((Stage) scene.getWindow()).close();
     }
 }

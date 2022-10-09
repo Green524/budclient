@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -7,8 +11,8 @@
 
 <AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chenum.controller.LogFXMLController">
    <children>
-      <TextArea fx:id="consArea" layoutY="22.0" prefHeight="381.0" prefWidth="600.0"/>
-      <HBox prefHeight="100.0" prefWidth="600.0">
+      <TextArea fx:id="consArea" layoutX="7.0" layoutY="42.0" prefHeight="381.0" prefWidth="600.0" />
+      <HBox layoutY="25.0" prefHeight="100.0" prefWidth="600.0">
          <children>
             <RadioButton fx:id="infoBtn" mnemonicParsing="false" text="info" />
             <RadioButton fx:id="warnBtn" mnemonicParsing="false" text="warn" />
@@ -17,5 +21,19 @@
             <RadioButton fx:id="traceBtn" mnemonicParsing="false" text="trace" />
          </children>
       </HBox>
+      <MenuBar prefHeight="25.0" prefWidth="607.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="选项">
+            <items>
+                  <CheckMenuItem mnemonicParsing="false" fx:id="autoRefreshMenu" text="自动刷新" />
+            </items>
+          </Menu>
+            <Menu mnemonicParsing="false" text="设置">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="刷新时间" />
+               </items>
+            </Menu>
+        </menus>
+      </MenuBar>
    </children>
 </AnchorPane>

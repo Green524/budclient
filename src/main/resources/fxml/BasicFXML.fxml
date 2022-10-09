@@ -16,7 +16,7 @@
             </Menu>
             <Menu text="工具"></Menu>
             <Menu text="帮助">
-                <MenuItem text="日志" onAction="#enterBlogView"></MenuItem>
+                <MenuItem text="日志" onAction="#enterLogView"></MenuItem>
             </Menu>
         </MenuBar>
 <!--        <ToolBar minHeight="-Infinity" minWidth="-Infinity" prefHeight="33.0" prefWidth="700.0">-->

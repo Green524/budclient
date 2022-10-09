@@ -8,9 +8,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.*;
 import org.apache.http.config.ConnectionConfig;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.entity.ContentType;
@@ -48,18 +46,12 @@ public class HttpUtil {
 
 
     public static String get(String url, Map<String,Object> params,Header[] headers) throws IOException {
-//        try {
             HttpGet get = new HttpGet(url + getURlParameter(params));
             get.setHeaders(headers);
             get.setHeader("Content-Type","form-data");
             CloseableHttpResponse response = client.execute(get);
             HttpEntity respEntity = response.getEntity();
             return EntityUtils.toString(respEntity, StandardCharsets.UTF_8);
-//        }catch (Exception e){
-//            e.printStackTrace();
-//            System.out.println("连接失败:" + e.getMessage());
-//            throw new RuntimeException("连接失败");
-//        }
     }
 
     public static String post(String url, Map<String,Object> params) throws IOException {
@@ -67,7 +59,6 @@ public class HttpUtil {
     }
 
     public static String post(String url, Map<String,Object> params, Header[] headers) throws IOException {
-//        try {
             HttpPost post = new HttpPost(url);
             StringEntity entity = new StringEntity(JsonUtil.toJsonString(params), ContentType.APPLICATION_JSON);
             post.setEntity(entity);
@@ -75,12 +66,24 @@ public class HttpUtil {
             CloseableHttpResponse response = client.execute(post);
             HttpEntity respEntity = response.getEntity();
             return EntityUtils.toString(respEntity, StandardCharsets.UTF_8);
-//        }catch (IOException e){
-//            e.printStackTrace();
-//            System.out.println("连接失败:" + e.getMessage());
-//            throw new RuntimeException("连接失败");
-//        }
+    }
 
+    public static String put(String url, Map<String,Object> params, Header[] headers) throws IOException {
+        HttpPut put = new HttpPut(url);
+        StringEntity entity = new StringEntity(JsonUtil.toJsonString(params), ContentType.APPLICATION_JSON);
+        put.setEntity(entity);
+        put.setHeaders(headers);
+        CloseableHttpResponse response = client.execute(put);
+        HttpEntity respEntity = response.getEntity();
+        return EntityUtils.toString(respEntity, StandardCharsets.UTF_8);
+    }
+
+    public static String delete(String url,Header[] headers) throws IOException {
+        HttpDelete delete = new HttpDelete(url);
+        delete.setHeaders(headers);
+        CloseableHttpResponse response = client.execute(delete);
+        HttpEntity respEntity = response.getEntity();
+        return EntityUtils.toString(respEntity, StandardCharsets.UTF_8);
     }
 
     private static String getURlParameter(Map<String,Object> paramsMap){
