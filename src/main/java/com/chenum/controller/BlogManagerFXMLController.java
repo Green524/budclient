@@ -12,21 +12,22 @@ import com.chenum.util.HttpUtil;
 import com.chenum.util.JsonUtil;
 import com.chenum.util.TimeUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
-import javafx.application.Platform;
-import javafx.beans.binding.Binding;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.cell.TextFieldListCell;
-import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -40,12 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URL;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -266,15 +262,22 @@ public class BlogManagerFXMLController{
                 textArea.setText(newValue.getContent());
                 title.setText(newValue.getTitle());
                 ObservableList<Node> children = authorBox.getChildren();
-                children.remove(1,children.size());
+                if (children.size() > 2){
+                    children.remove(1,children.size());
+                }
                 children.addAll(getLabel(newValue.getAuthor(),(Label) children.get(0)));
 
                 ObservableList<Node> contributorBoxChildren = contributorBox.getChildren();
-                contributorBoxChildren.remove(1,contributorBoxChildren.size());
+                if (contributorBoxChildren.size() > 2){
+                    contributorBoxChildren.remove(1,contributorBoxChildren.size());
+                }
                 contributorBoxChildren.addAll(getLabel(newValue.getContribution(),(Label) contributorBoxChildren.get(0)));
 
                 ObservableList<Node> contentTagBoxChildren = contentTagBox.getChildren();
-                contentTagBoxChildren.remove(1,contentTagBoxChildren.size());
+
+                if (contentTagBoxChildren.size() > 2){
+                    contentTagBoxChildren.remove(1,contentTagBoxChildren.size());
+                }
                 contentTagBoxChildren.addAll(getContentTagLabel(newValue.getContentTag(),(Label) contentTagBoxChildren.get(0)));
                 if (newValue.getIsComment()){
                     isCommentRBtn.setSelected(true);
@@ -355,7 +358,42 @@ public class BlogManagerFXMLController{
     @FXML
     public void pushLabel(){
         TextField textField = new TextField();
-        authorBox.getChildren().add(1,textField);
+        textField.setPrefHeight(30);
+        textField.setPrefWidth(80);
+        textField.focusedProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                ReadOnlyBooleanProperty readOnlyBooleanProperty = (ReadOnlyBooleanProperty) observable;
+                Object bean = readOnlyBooleanProperty.getBean();
+                boolean value = readOnlyBooleanProperty.getValue();
+                if (!value && bean instanceof TextField){
+                    String v = ((TextField)(readOnlyBooleanProperty.getBean())).getText();
+                    ObservableList<Node> children =  authorBox.getChildren();
+                    children.remove(bean);
+                    Label label = new Label(v);
+                    label.setPrefHeight(38);
+
+                    label.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                        @Override
+                        public void handle(MouseEvent mouseEvent) {
+                            if (mouseEvent.getButton().compareTo(MouseButton.SECONDARY) == 0){
+                                MenuItem menuItem = new MenuItem("删除");
+                                menuItem.setOnAction(new EventHandler<ActionEvent>() {
+                                    @Override
+                                    public void handle(ActionEvent actionEvent) {
+                                        children.remove(label);
+                                    }
+                                });
+                                label.setContextMenu(new ContextMenu(menuItem));
+                            }
+                        }
+                    });
+
+                    authorBox.getChildren().add(children.size() - 1,label);
+                }
+            }
+        });
+        authorBox.getChildren().add(authorBox.getChildren().size() -1,textField);
     }
 
     private List<Label> getLabel(String context,Label template){
