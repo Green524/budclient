@@ -17,6 +17,7 @@ import javafx.beans.Observable;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -168,6 +169,7 @@ public class BlogManagerFXMLController{
                 Map<String,Object> params = getViewArticle();
                 params.put("isPublish", finalIsPublish);
                 params.put("id",id);
+                params.put("publishTime", TimeUtil.format(publishTimePK.dateTimeProperty().get()));
                 try {
                     return HttpUtil.put(ADMIN_MODIFY,params,new Header[]{getHeader()});
                 } catch (IOException e) {
@@ -197,6 +199,7 @@ public class BlogManagerFXMLController{
             public String call() {
                 Map<String,Object> params = getViewArticle();
                 params.put("isPublish", finalIsPublish);
+                params.put("publishTime", TimeUtil.format(publishTimePK.dateTimeProperty().get()));
                 try {
                     return HttpUtil.post(ADMIN_ADD,params,new Header[]{getHeader()});
                 } catch (IOException e) {
@@ -263,22 +266,21 @@ public class BlogManagerFXMLController{
                 title.setText(newValue.getTitle());
                 ObservableList<Node> children = authorBox.getChildren();
                 if (children.size() > 2){
-                    children.remove(1,children.size());
+                    children.remove(1,children.size() - 1);
                 }
-                children.addAll(getLabel(newValue.getAuthor(),(Label) children.get(0)));
+                children.addAll(1,getLabel(newValue.getAuthor(),(Label) children.get(0)));
 
                 ObservableList<Node> contributorBoxChildren = contributorBox.getChildren();
                 if (contributorBoxChildren.size() > 2){
-                    contributorBoxChildren.remove(1,contributorBoxChildren.size());
+                    contributorBoxChildren.remove(1,contributorBoxChildren.size() - 1);
                 }
-                contributorBoxChildren.addAll(getLabel(newValue.getContribution(),(Label) contributorBoxChildren.get(0)));
+                contributorBoxChildren.addAll(1,getLabel(newValue.getContribution(),(Label) contributorBoxChildren.get(0)));
 
                 ObservableList<Node> contentTagBoxChildren = contentTagBox.getChildren();
-
                 if (contentTagBoxChildren.size() > 2){
-                    contentTagBoxChildren.remove(1,contentTagBoxChildren.size());
+                    contentTagBoxChildren.remove(1,contentTagBoxChildren.size()- 1);
                 }
-                contentTagBoxChildren.addAll(getContentTagLabel(newValue.getContentTag(),(Label) contentTagBoxChildren.get(0)));
+                contentTagBoxChildren.addAll(1,getContentTagLabel(newValue.getContentTag(),(Label) contentTagBoxChildren.get(0)));
                 if (newValue.getIsComment()){
                     isCommentRBtn.setSelected(true);
                 }else{
@@ -356,7 +358,20 @@ public class BlogManagerFXMLController{
     }
 
     @FXML
-    public void pushLabel(){
+    public void pushLabel(ActionEvent actionEvent){
+        Button button = (Button) actionEvent.getSource();
+        String btnId = button.getId();
+        ObservableList<Node> children = switch (btnId){
+            case "addAuthorBtn" ->  authorBox.getChildren();
+            case "addTagBtn" ->  contentTagBox.getChildren();
+            case "addCtbBtn" ->  contributorBox.getChildren();
+            default -> FXCollections.emptyObservableList();
+        };
+        for (int i = 1; i <= children.size()-1; i++) {
+            if (children.get(i) instanceof TextField){
+                return;
+            }
+        }
         TextField textField = new TextField();
         textField.setPrefHeight(30);
         textField.setPrefWidth(80);
@@ -368,11 +383,13 @@ public class BlogManagerFXMLController{
                 boolean value = readOnlyBooleanProperty.getValue();
                 if (!value && bean instanceof TextField){
                     String v = ((TextField)(readOnlyBooleanProperty.getBean())).getText();
-                    ObservableList<Node> children =  authorBox.getChildren();
+                    if (v == null || "".equals(v)){
+                        return;
+                    }
                     children.remove(bean);
                     Label label = new Label(v);
                     label.setPrefHeight(38);
-
+                    label.setTooltip(new Tooltip(v));
                     label.setOnMouseClicked(new EventHandler<MouseEvent>() {
                         @Override
                         public void handle(MouseEvent mouseEvent) {
@@ -389,11 +406,11 @@ public class BlogManagerFXMLController{
                         }
                     });
 
-                    authorBox.getChildren().add(children.size() - 1,label);
+                    children.add(children.size() - 1,label);
                 }
             }
         });
-        authorBox.getChildren().add(authorBox.getChildren().size() -1,textField);
+        children.add(children.size() -1,textField);
     }
 
     private List<Label> getLabel(String context,Label template){
@@ -406,6 +423,7 @@ public class BlogManagerFXMLController{
             public Label apply(Map<String, Object> stringObjectMap) {
                 String name = (String) stringObjectMap.get("name");
                 Label label = new Label(name);
+                label.setTooltip(new Tooltip(name));
                 label.setPrefWidth(template.getPrefWidth());
                 label.setPrefHeight(template.getPrefHeight());
                 return label;
@@ -429,11 +447,11 @@ public class BlogManagerFXMLController{
     }
     private List<Map<String,Object>> fromLabel(HBox authorBox){
         ObservableList<Node> labels = authorBox.getChildren();
-        if (labels.size() == 1){
+        if (labels.size() == 2){
             return Collections.emptyList();
         }
         List<Map<String,Object>> author = new ArrayList<>(labels.size());
-        for (int i = 1; i <= labels.size() - 1; i++) {
+        for (int i = 1; i <= labels.size() - 2; i++) {
             Label label = (Label) labels.get(i);
             Map<String,Object> map = new HashMap<>(1);
             map.put("name",label.getText());
@@ -447,7 +465,7 @@ public class BlogManagerFXMLController{
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        for (int i = 1; i <= labels.size() - 1; i++) {
+        for (int i = 1; i <= labels.size() - 2; i++) {
             Label label = (Label) labels.get(i);
             sb.append(label.getText()).append(",");
         }
@@ -469,6 +487,24 @@ public class BlogManagerFXMLController{
         centerStackPaneBottomVbox.prefHeightProperty().bind(centerStackPaneBottom.heightProperty());
         blogListView.prefWidthProperty().bind(leftPane.widthProperty());
         blogListView.prefHeightProperty().bind(leftPane.heightProperty());
+        textArea.setWrapText(true);
+        newArticleMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if (newArticleMenuItem.isSelected()){
+                    textArea.setText(null);
+                    title.setText(null);
+                    authorBox.getChildren().remove(1,authorBox.getChildren().size() - 1);
+                    contentTagBox.getChildren().remove(1,contentTagBox.getChildren().size() - 1);
+                    contributorBox.getChildren().remove(1,contributorBox.getChildren().size() - 1);
+                    createTimePK.dateTimeProperty().set(LocalDateTime.now());
+                    publishTimePK.dateTimeProperty().set(LocalDateTime.now());
+                    isCommentRBtn.setSelected(false);
+                    isLikeRBtn.setSelected(false);
+                    isAdmireRBtn.setSelected(false);
+                }
+            }
+        });
     }
 
     private List<Article> queryItems(){

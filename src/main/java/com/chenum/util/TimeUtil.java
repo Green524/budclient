@@ -26,4 +26,10 @@ public class TimeUtil {
         }
         return LocalDateTime.parse(sdf.format(date), DateTimeFormatter.ofPattern(PATTERN));
     }
+
+    public static String format(LocalDateTime date){
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(PATTERN);
+        return dateTimeFormatter.format(date);
+    }
+
 }

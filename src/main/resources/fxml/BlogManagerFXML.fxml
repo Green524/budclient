@@ -75,7 +75,7 @@
                                                 <HBox fx:id="authorBox" prefHeight="38.0" prefWidth="427.0">
                                                     <children>
                                                         <Label prefHeight="38.0" prefWidth="51.0" text="作者：" />
-                                                        <Button mnemonicParsing="false" onAction="#pushLabel" prefHeight="26.0" prefWidth="41.0" text="添加">
+                                                        <Button fx:id="addAuthorBtn" mnemonicParsing="false" onAction="#pushLabel" prefHeight="26.0" prefWidth="41.0" text="添加">
                                                             <HBox.margin>
                                                                 <Insets top="5.0" />
                                                             </HBox.margin>
@@ -85,7 +85,7 @@
                                                 <HBox fx:id="contentTagBox" prefHeight="23.0" prefWidth="229.0">
                                                     <children>
                                                         <Label prefHeight="38.0" prefWidth="51.0" text="标签：" />
-                                                        <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="41.0" text="添加">
+                                                        <Button fx:id="addTagBtn" mnemonicParsing="false" onAction="#pushLabel" prefHeight="26.0" prefWidth="41.0" text="添加">
                                                             <HBox.margin>
                                                                 <Insets />
                                                             </HBox.margin>
@@ -95,7 +95,7 @@
                                                 <HBox fx:id="contributorBox" prefHeight="37.0" prefWidth="300.0">
                                                     <children>
                                                         <Label prefHeight="38.0" prefWidth="51.0" text="贡献者：" />
-                                                        <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="41.0" text="添加">
+                                                        <Button fx:id="addCtbBtn" mnemonicParsing="false" onAction="#pushLabel" prefHeight="26.0" prefWidth="41.0" text="添加">
                                                             <HBox.margin>
                                                                 <Insets top="5.0" />
                                                             </HBox.margin>
